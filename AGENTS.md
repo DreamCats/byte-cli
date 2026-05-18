@@ -18,7 +18,8 @@ Build output is generated in `dist/`. Do not edit `dist/` directly.
 - `npm run dev -- <command>`: run sources with `tsx`, for example `npm run dev -- auth status`.
 - `npm run build`: bundle `src/cli.ts` into `dist/cli.js` with `tsup`.
 - `npm run typecheck`: run strict TypeScript checking without emitting files.
-- `npm link`: expose the built CLI globally as `byte-cli`.
+- `ln -sf $(pwd)/dist/cli.js ~/.local/bin/byte-cli`: symlink the built CLI to `~/.local/bin/`.
+  - **禁止使用 `npm link`**，统一用符号链接。
 - `bash -n install.sh`: syntax-check the installer after shell changes.
 
 There is currently no `npm test` script or test directory.
