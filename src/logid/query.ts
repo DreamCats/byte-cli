@@ -21,6 +21,7 @@ const VREGION_MAP: Record<string, string> = {
 export interface QueryOptions {
   psmList: string[];
   keywords: string[];
+  levels: string[];
   maxLen?: number;
   scanSpanMin?: number;
 }
@@ -52,9 +53,10 @@ export async function query(
   const kwFilter = new KeywordFilter(options.keywords);
   const maxLen = options.maxLen ?? 1000;
 
+  const levels = options.levels.map((l) => l.toLowerCase());
   const results: FlattenedLogEntry[] = [];
   for (const item of data.data.items) {
-    results.push(...extractEntries(item, sanitizer, kwFilter, maxLen));
+    results.push(...extractEntries(item, sanitizer, kwFilter, levels, maxLen));
   }
   return results;
 }
@@ -63,6 +65,7 @@ function extractEntries(
   item: LogItem,
   sanitizer: MessageSanitizer,
   kwFilter: KeywordFilter,
+  levels: string[],
   maxLen: number,
 ): FlattenedLogEntry[] {
   const entries: FlattenedLogEntry[] = [];
@@ -78,6 +81,7 @@ function extractEntries(
     }
 
     if (!msg) continue;
+    if (levels.length > 0 && !levels.includes(val.level.toLowerCase())) continue;
     msg = sanitizer.sanitize(msg);
     if (!kwFilter.matches(msg)) continue;
     if (maxLen > 0 && msg.length > maxLen) msg = msg.slice(0, maxLen) + "...";
