@@ -35,10 +35,18 @@ echo "安装依赖..."
 npm install
 echo "构建..."
 npm run build
+chmod +x "$INSTALL_DIR/dist/cli.js"
 
-# 4. 全局链接
-echo "全局链接..."
-npm link
+# 4. 创建软链接到 ~/.local/bin
+LINK_DIR="$HOME/.local/bin"
+mkdir -p "$LINK_DIR"
+ln -sf "$INSTALL_DIR/dist/cli.js" "$LINK_DIR/byte-cli"
+echo "已创建软链接: $LINK_DIR/byte-cli"
+
+if [[ ":$PATH:" != *":$LINK_DIR:"* ]]; then
+    echo "提示: 请将 $LINK_DIR 添加到 PATH"
+    echo "  export PATH=\"$LINK_DIR:\$PATH\""
+fi
 
 # 5. 安装 skills（给 LLM Agent 使用）
 echo ""
