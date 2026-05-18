@@ -26,7 +26,7 @@ export const LogItemSchema = z.object({
 });
 
 export const LogMetaSchema = z.object({
-  scan_time_range: z.string().default(""),
+  scan_time_range: z.union([z.string(), z.array(z.unknown())]).default(""),
   level_list: z.array(z.string()).default([]),
 });
 

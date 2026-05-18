@@ -14,7 +14,7 @@ const LOG_SERVICE_URLS: Record<string, string> = {
 
 const VREGION_MAP: Record<string, string> = {
   us: "US-TTP,US-TTP2",
-  i18n: "SG",
+  i18n: "Singapore-Central",
   eu: "EU",
 };
 
