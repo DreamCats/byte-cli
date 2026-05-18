@@ -4,11 +4,16 @@
 
 ## 安装
 
+一键安装：
+
 ```bash
-npm install
-npm run build
-# 全局链接
-npm link
+git clone git@github.com:DreamCats/byte-cli.git ~/.byte-cli && cd ~/.byte-cli && npm install && npm run build && npm link
+```
+
+更新：
+
+```bash
+cd ~/.byte-cli && git pull && npm install && npm run build && npm link
 ```
 
 ## 开发
