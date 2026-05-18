@@ -26,18 +26,18 @@ export type MCPServerListResponse = z.infer<typeof MCPServerListResponseSchema>;
 
 export const ToolParameterSchema: z.ZodType<ToolParameter> = z.lazy(() =>
   z.object({
-    type: z.string(),
-    description: z.string(),
-    format: z.string(),
-    properties: z.record(ToolParameterSchema).nullable(),
-    items: ToolParameterSchema.nullable(),
-    required: z.array(z.string()),
+    type: z.string().default("object"),
+    description: z.string().default(""),
+    format: z.string().optional(),
+    properties: z.record(ToolParameterSchema).nullable().default(null),
+    items: ToolParameterSchema.nullable().default(null),
+    required: z.array(z.string()).default([]),
   }),
 ) as z.ZodType<ToolParameter>;
 export type ToolParameter = {
   type: string;
   description: string;
-  format: string;
+  format?: string;
   properties: Record<string, ToolParameter> | null;
   items: ToolParameter | null;
   required: string[];
