@@ -4,10 +4,16 @@
 
 ## 安装
 
-一键安装：
+```bash
+curl -fsSL https://raw.githubusercontent.com/DreamCats/byte-cli/main/install.sh | bash
+```
+
+手动安装：
 
 ```bash
-git clone git@github.com:DreamCats/byte-cli.git ~/.byte-cli && cd ~/.byte-cli && npm install && npm run build && npm link
+git clone git@github.com:DreamCats/byte-cli.git ~/.byte-cli
+cd ~/.byte-cli
+npm install && npm run build && npm link
 ```
 
 更新：
