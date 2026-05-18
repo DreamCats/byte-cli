@@ -11,15 +11,15 @@ curl -fsSL https://raw.githubusercontent.com/DreamCats/byte-cli/main/install.sh 
 手动安装：
 
 ```bash
-git clone git@github.com:DreamCats/byte-cli.git ~/.byte-cli
-cd ~/.byte-cli
+git clone git@github.com:DreamCats/byte-cli.git "${BYTE_CLI_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/byte-cli}"
+cd "${BYTE_CLI_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/byte-cli}"
 npm install && npm run build && npm link
 ```
 
 更新：
 
 ```bash
-cd ~/.byte-cli && git pull && npm install && npm run build && npm link
+cd "${BYTE_CLI_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/byte-cli}" && git pull && npm install && npm run build && npm link
 ```
 
 ## 开发

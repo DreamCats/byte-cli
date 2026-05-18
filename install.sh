@@ -2,7 +2,8 @@
 set -e
 
 REPO="git@github.com:DreamCats/byte-cli.git"
-INSTALL_DIR="$HOME/.byte-cli"
+DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+INSTALL_DIR="${BYTE_CLI_HOME:-$DATA_HOME/byte-cli}"
 
 echo "=== byte-cli 安装脚本 ==="
 
