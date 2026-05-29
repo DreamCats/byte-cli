@@ -67,20 +67,42 @@ export const ToolCallContentSchema = z.object({
   text: z.string().default(""),
 });
 
-export const ToolCallMetaSchema = z.object({
-  trace: z.record(z.string()).default({}),
-});
+export const ToolCallMetaSchema = z.record(z.unknown()).default({});
 
-export const ToolCallResultSchema = z.object({
+export const ToolCallResultSchema = z.preprocess((value) => {
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    const obj = value as Record<string, unknown>;
+    return {
+      ...obj,
+      meta: obj.meta ?? obj._meta ?? {},
+    };
+  }
+  return value;
+}, z.object({
   content: z.array(ToolCallContentSchema).default([]),
-  meta: ToolCallMetaSchema.default({}),
-});
+  meta: ToolCallMetaSchema,
+}));
 
-export const ToolCallResponseSchema = z.object({
+export const ToolCallResponseSchema = z.preprocess((value) => {
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    const obj = value as Record<string, unknown>;
+    if (!("result" in obj) && ("content" in obj || "meta" in obj || "_meta" in obj)) {
+      return {
+        jsonrpc: "2.0",
+        id: 1,
+        result: {
+          content: obj.content ?? [],
+          meta: obj.meta ?? obj._meta ?? {},
+        },
+      };
+    }
+  }
+  return value;
+}, z.object({
   jsonrpc: z.string().default("2.0"),
   id: z.number().default(1),
   result: ToolCallResultSchema.default({}),
-});
+}));
 export type ToolCallResponse = z.infer<typeof ToolCallResponseSchema>;
 
 export function formatServerDate(dateStr: string): string {
