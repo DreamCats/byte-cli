@@ -1,41 +1,70 @@
 # byte-cli
 
-字节内部开发工具统一 CLI（TypeScript 版）。
+字节内部开发工具统一 CLI（Go 版）。
 
-## 安装
+## Install
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/DreamCats/byte-cli/main/install.sh | bash
-```
-
-手动安装：
+One-line install:
 
 ```bash
-git clone git@github.com:DreamCats/byte-cli.git "${BYTE_CLI_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/byte-cli}"
-cd "${BYTE_CLI_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/byte-cli}"
-npm install && npm run build && npm link
+go install github.com/DreamCats/byte-cli/cmd/byte-cli@latest
 ```
 
-更新：
+From local source:
 
 ```bash
-cd "${BYTE_CLI_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/byte-cli}" && git pull && npm install && npm run build && npm link
+go install ./cmd/byte-cli
 ```
 
-## 开发
+Development build:
 
 ```bash
-npm run dev -- auth status    # 直接运行源码
-npm run build                  # 构建到 dist/
-npm run typecheck              # 类型检查
+go build -o byte-cli ./cmd/byte-cli
+./byte-cli version
 ```
 
-## 命令一览
+## Development
 
+```bash
+go test ./...
+go build ./...
+gofmt -w cmd internal
 ```
-byte-cli auth login -r cn          # 认证
-byte-cli auth status               # 查看认证状态
-byte-cli auth config show          # 查看配置
+
+Or use Make:
+
+```bash
+make test
+make build
+make install
+```
+
+## Configuration
+
+The Go implementation keeps the TypeScript config layout:
+
+```text
+~/.config/byte-cli/
+├── config.yaml       # regions.<region>.cookie, proxy.https/http
+└── token_cache/      # <region>.json
+```
+
+Supported regions:
+
+```text
+cn, i18n, us, eu, codebase
+```
+
+Cookies and tokens are sensitive. Avoid pasting real credentials into docs,
+tests, issues, or commits.
+
+## Common Commands
+
+```bash
+byte-cli auth login -r cn
+byte-cli auth status
+byte-cli auth token -r cn
+byte-cli auth config show
 byte-cli auth config set-cookie <cookie> -r cn
 
 byte-cli codebase repo info <group/project>
@@ -56,20 +85,38 @@ byte-cli mcp tools <server-id>
 byte-cli mcp call <server-id> <tool-name> -a key=value
 ```
 
-## 技术栈
+Global `--json` is supported, including after subcommands:
 
-- TypeScript + Node.js 18+
-- Commander.js — CLI 框架
-- Zod — 数据校验（替代 Pydantic）
-- 原生 fetch — HTTP 请求
-- tsup — 构建打包
-
-## 配置文件
-
-```
-~/.config/byte-cli/
-├── config.yaml       # regions.{region}.cookie, proxy.https/http
-└── token_cache/      # {region}.json
+```bash
+byte-cli --json iam list -r cn
+byte-cli iam list -r cn --json
 ```
 
-与 Python 版 `byte-helper` 共享同一份配置目录，可无缝切换。
+## Skills
+
+Agent-facing skills are kept under `skills/byte-*`:
+
+```text
+skills/
+├── byte-auth/
+├── byte-iam/
+├── byte-log/
+├── byte-mcp/
+├── byte-psm/
+└── byte-repo/
+```
+
+Install or refresh them with the `skills` CLI from the repository root:
+
+```bash
+for skill in skills/byte-*; do
+  skills remove "$(basename "$skill")" -g -y 2>/dev/null || true
+  skills add "$skill" -g -y
+done
+```
+
+## Notes
+
+This version preserves the old command surface and config/cache paths while
+replacing the TypeScript runtime with a Go binary. Network-backed commands still
+depend on valid ByteDance cookies and internal network access.

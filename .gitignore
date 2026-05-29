@@ -1,8 +1,10 @@
-# Dependencies
-node_modules/
-
-# Build
+# Build artifacts
+byte-cli
 dist/
+
+# Go
+*.test
+coverage.out
 
 # IDE
 .vscode/
@@ -12,11 +14,5 @@ dist/
 *~
 .DS_Store
 
-# TypeScript
-*.tsbuildinfo
-
-# Testing
-coverage/
-
-# Byte-cli 本地配置（含敏感信息）
+# Byte-cli local config may contain secrets.
 ~/.config/byte-cli/

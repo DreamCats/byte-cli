@@ -2,44 +2,59 @@
 
 ## Project Structure & Module Organization
 
-This repository contains `byte-cli`, a TypeScript Node.js CLI. The entrypoint is `src/cli.ts`, which registers Commander subcommands from feature modules under `src/<domain>/`:
+This repository contains `byte-cli`, a Go CLI migrated from the TypeScript
+implementation. The entrypoint is `cmd/byte-cli/main.go`, which delegates to
+`internal/cli`.
 
-- `src/auth/`: cookie configuration, JWT token retrieval, region handling.
-- `src/codebase/`: repository and merge request queries.
-- `src/logid/`: trace/log lookup and filtering.
-- `src/psm/`, `src/iam/`, `src/mcp/`: internal service-specific commands.
-- `src/common/`: shared config, cache, HTTP helpers.
-- `skills/byte-*`: skill packages installed by `install.sh`.
+- `internal/cli/`: top-level argument normalization, command dispatch, exits.
+- `internal/commands/`: command implementations for `auth`, `codebase`,
+  `logid`, `psm`, `iam`, and `mcp`.
+- `internal/auth/`: region definitions, JWT token retrieval, token cache.
+- `internal/config/`: `~/.config/byte-cli/config.yaml` loading and saving.
+- `internal/httpclient/`: shared HTTP client behavior, timeout, proxy handling.
+- `internal/jsonutil/`: API response key normalization helpers.
+- `skills/byte-*`: agent-facing skill packages.
 
-Build output is generated in `dist/`. Do not edit `dist/` directly.
+Do not add generated build artifacts to the repository. The local `byte-cli`
+binary produced by `make build` is disposable.
 
 ## Build, Test, and Development Commands
 
-- `npm run dev -- <command>`: run sources with `tsx`, for example `npm run dev -- auth status`.
-- `npm run build`: bundle `src/cli.ts` into `dist/cli.js` with `tsup`.
-- `npm run typecheck`: run strict TypeScript checking without emitting files.
-- `ln -sf $(pwd)/dist/cli.js ~/.local/bin/byte-cli`: symlink the built CLI to `~/.local/bin/`.
-  - **禁止使用 `npm link`**，统一用符号链接。
-- `bash -n install.sh`: syntax-check the installer after shell changes.
+- `go test ./...`: run all unit tests.
+- `go build ./...`: verify all packages compile.
+- `go build -o byte-cli ./cmd/byte-cli`: build a local CLI binary.
+- `go run ./cmd/byte-cli <command>`: run the CLI without installing it.
+- `make test`, `make build`, `make install`: wrappers for common Go commands.
 
-There is currently no `npm test` script or test directory.
+When changing command behavior, run `go test ./...` and `go build ./...`.
+For help text changes, also spot-check representative commands such as
+`go run ./cmd/byte-cli --help` and `go run ./cmd/byte-cli mcp call --help`.
 
 ## Coding Style & Naming Conventions
 
-Use TypeScript ES modules and keep imports compatible with Node16 resolution; local runtime imports should include `.js` extensions. Follow two-space indentation and Commander-based command structure. Name domain command exports as `<domain>Cmd`, API helpers in `api.ts`, schemas/types in `models.ts`, and shared utilities under `src/common/`.
+Use idiomatic Go and keep changes small. Run `gofmt` on touched Go files.
+Prefer the existing package layout over adding new abstractions. Keep command
+parsing close to the relevant command implementation in `internal/commands`.
 
-Prefer Zod for runtime validation and typed interfaces for API responses. Keep output concise and avoid printing secrets; mask cookies and tokens unless a command explicitly returns a token.
+Use structured JSON decoding for API responses. If an upstream API returns both
+PascalCase and snake_case keys, use the existing normalization path instead of
+ad hoc string manipulation.
 
 ## Testing Guidelines
 
-When changing command behavior, run `npm run typecheck` and `npm run build`. For auth, config, installer, or shell changes, also run targeted checks such as `npm run dev -- auth status` or `bash -n install.sh`. Do not claim tests passed unless you ran them.
+Add focused tests for parsing, formatting, config handling, and response
+normalization. Avoid tests that call internal network APIs. For network-backed
+commands, unit-test request-independent behavior and document any manual
+verification separately.
 
-## Commit & Pull Request Guidelines
-
-Recent commits use Conventional Commit-style prefixes such as `feat:`, `docs:`, and `chore:`. Keep messages short and imperative, for example `feat: add mcp tool lookup`.
-
-Pull requests should describe the changed command or workflow, list verification commands, and call out config or credential-handling impact. Link issues when applicable. Screenshots are usually unnecessary for this CLI.
+Do not claim tests passed unless you ran them in this repository.
 
 ## Security & Configuration Tips
 
-User configuration is stored in `~/.config/byte-cli/config.yaml`; token cache files are managed under the same config area. Treat cookies, tokens, internal endpoints, and service account secrets as sensitive. Do not add real credentials to docs, examples, tests, or commits.
+User configuration is stored in `~/.config/byte-cli/config.yaml`; token cache
+files are stored under `~/.config/byte-cli/token_cache/`. Treat cookies, JWTs,
+internal endpoints, and service account secrets as sensitive. Mask credentials
+in logs and docs, and never commit real credentials.
+
+Plain output should stay concise. JSON output should preserve useful response
+shape without printing secrets unless the command explicitly returns a secret.
