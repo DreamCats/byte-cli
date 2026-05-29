@@ -3,6 +3,31 @@ import * as api from "./api.js";
 import { formatServerDate } from "./models.js";
 import type { RegionValue } from "../auth/regions.js";
 
+/**
+ * Safe JSON parse that preserves large integers as strings
+ * to avoid precision loss with IDs like product_id.
+ */
+function safeJsonParse(text: string): unknown {
+  return JSON.parse(text, (_key: string, value: unknown) => {
+    if (typeof value === "number" && !Number.isSafeInteger(value)) {
+      return String(value);
+    }
+    return value;
+  });
+}
+
+/**
+ * Safe JSON stringify that handles BigInt values.
+ */
+function safeJsonStringify(obj: unknown, space?: number): string {
+  return JSON.stringify(obj, (_key: string, value: unknown) => {
+    if (typeof value === "bigint") {
+      return String(value);
+    }
+    return value;
+  }, space);
+}
+
 export const mcpCmd = new Command("mcp").description("MCP Server 查询");
 
 mcpCmd
@@ -82,7 +107,7 @@ mcpCmd
         const key = a.slice(0, eqIdx);
         const value = a.slice(eqIdx + 1);
         try {
-          arguments_[key] = JSON.parse(value);
+          arguments_[key] = safeJsonParse(value);
         } catch {
           arguments_[key] = value;
         }
@@ -109,8 +134,8 @@ mcpCmd
         for (const content of resp.result.content) {
           if (content.type === "text") {
             try {
-              const data = JSON.parse(content.text);
-              console.log(JSON.stringify(data, null, 2));
+              const data = safeJsonParse(content.text);
+              console.log(safeJsonStringify(data, 2));
             } catch {
               console.log(content.text);
             }
