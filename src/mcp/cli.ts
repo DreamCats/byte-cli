@@ -6,14 +6,14 @@ import type { RegionValue } from "../auth/regions.js";
 /**
  * Safe JSON parse that preserves large integers as strings
  * to avoid precision loss with IDs like product_id.
+ *
+ * Uses regex to quote large integers before JSON.parse to prevent
+ * JavaScript from losing precision on numbers beyond Number.MAX_SAFE_INTEGER.
  */
 function safeJsonParse(text: string): unknown {
-  return JSON.parse(text, (_key: string, value: unknown) => {
-    if (typeof value === "number" && !Number.isSafeInteger(value)) {
-      return String(value);
-    }
-    return value;
-  });
+  // Quote large integers (16+ digits) that appear after : or in arrays
+  const quoted = text.replace(/(\:|\[|,)\s*(-?\d{16,})/g, '$1"$2"');
+  return JSON.parse(quoted);
 }
 
 /**
