@@ -43,7 +43,7 @@ Options:
 	fs.SetOutput(out.Err)
 	regionOpt := fs.String("region", "cn", "区域: cn/i18n/us/eu/codebase")
 	fs.StringVar(regionOpt, "r", "cn", "区域: cn/i18n/us/eu/codebase")
-	if err := fs.Parse(args); err != nil {
+	if err := fs.Parse(normalizeFlags(args, stringSet("r", "region"), nil)); err != nil {
 		return 1, err
 	}
 	region, err := auth.ParseRegion(*regionOpt)
@@ -100,7 +100,7 @@ Options:
 	fs.SetOutput(out.Err)
 	regionOpt := fs.String("region", "cn", "区域: cn/i18n/us/eu/codebase")
 	fs.StringVar(regionOpt, "r", "cn", "区域: cn/i18n/us/eu/codebase")
-	if err := fs.Parse(args); err != nil {
+	if err := fs.Parse(normalizeFlags(args, stringSet("r", "region"), nil)); err != nil {
 		return 1, err
 	}
 	region, err := auth.ParseRegion(*regionOpt)
@@ -179,7 +179,7 @@ Options:
 	fs.SetOutput(out.Err)
 	regionOpt := fs.String("region", "cn", "区域: cn/i18n/us/eu/codebase")
 	fs.StringVar(regionOpt, "r", "cn", "区域: cn/i18n/us/eu/codebase")
-	if err := fs.Parse(args); err != nil {
+	if err := fs.Parse(normalizeFlags(args, stringSet("r", "region"), nil)); err != nil {
 		return 1, err
 	}
 	if fs.NArg() == 0 {

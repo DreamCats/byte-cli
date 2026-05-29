@@ -122,7 +122,7 @@ Options:
 	fs.StringVar(page, "p", "1", "页码")
 	size := fs.String("size", "10", "每页数量")
 	fs.StringVar(size, "s", "10", "每页数量")
-	if err := fs.Parse(args); err != nil {
+	if err := fs.Parse(normalizeFlags(args, stringSet("o", "owner", "r", "region", "p", "page", "s", "size"), nil)); err != nil {
 		return 1, err
 	}
 	pageNum, _ := strconv.Atoi(*page)
@@ -179,7 +179,7 @@ Options:
 	fs.SetOutput(out.Err)
 	region := fs.String("region", "cn", "区域")
 	fs.StringVar(region, "r", "cn", "区域")
-	if err := fs.Parse(args); err != nil {
+	if err := fs.Parse(normalizeFlags(args, stringSet("r", "region"), nil)); err != nil {
 		return 1, err
 	}
 	if fs.NArg() == 0 {

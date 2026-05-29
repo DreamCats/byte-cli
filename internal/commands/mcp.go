@@ -143,7 +143,7 @@ Options:
 	fs.StringVar(limit, "l", "10", "每页数量")
 	offset := fs.String("offset", "0", "偏移量")
 	fs.StringVar(offset, "o", "0", "偏移量")
-	if err := fs.Parse(args); err != nil {
+	if err := fs.Parse(normalizeFlags(args, stringSet("s", "search", "e", "env", "r", "region", "l", "limit", "o", "offset"), nil)); err != nil {
 		return 1, err
 	}
 	limitNum, _ := strconv.Atoi(*limit)
@@ -194,7 +194,7 @@ Options:
 	fs.SetOutput(out.Err)
 	region := fs.String("region", "cn", "区域")
 	fs.StringVar(region, "r", "cn", "区域")
-	if err := fs.Parse(args); err != nil {
+	if err := fs.Parse(normalizeFlags(args, stringSet("r", "region"), nil)); err != nil {
 		return 1, err
 	}
 	if fs.NArg() == 0 {
@@ -260,7 +260,7 @@ Options:
 	fs.Var(&argValues, "a", "工具参数 key=value")
 	region := fs.String("region", "cn", "区域")
 	fs.StringVar(region, "r", "cn", "区域")
-	if err := fs.Parse(args); err != nil {
+	if err := fs.Parse(normalizeFlags(args, stringSet("a", "arg", "r", "region"), nil)); err != nil {
 		return 1, err
 	}
 	if fs.NArg() < 2 {

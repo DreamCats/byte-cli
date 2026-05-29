@@ -106,7 +106,7 @@ Options:
 	fs.Var(&levels, "l", "日志级别过滤")
 	limitOpt := fs.String("limit", "20", "最多显示条数")
 	maxLenOpt := fs.String("max-len", "300", "消息最大长度")
-	if err := fs.Parse(args); err != nil {
+	if err := fs.Parse(normalizeFlags(args, stringSet("r", "region", "p", "psm", "k", "keyword", "l", "level", "limit", "max-len"), nil)); err != nil {
 		return 1, err
 	}
 	if fs.NArg() == 0 {

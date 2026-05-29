@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -19,10 +20,13 @@ func NewOutput(jsonOutput bool) Output {
 }
 
 func (o Output) PrintJSON(payload any) error {
-	data, err := json.MarshalIndent(payload, "", "  ")
-	if err != nil {
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
+	enc.SetEscapeHTML(false)
+	enc.SetIndent("", "  ")
+	if err := enc.Encode(payload); err != nil {
 		return err
 	}
-	_, err = fmt.Fprintln(o.Out, string(data))
+	_, err := fmt.Fprint(o.Out, buf.String())
 	return err
 }

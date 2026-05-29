@@ -16,71 +16,71 @@ const (
 )
 
 type Department struct {
-	ID        int    `json:"id"`
-	Name      string `json:"name"`
-	EnName    string `json:"en_name"`
-	TenantKey string `json:"tenant_key"`
+	ID        flexibleInt `json:"id"`
+	Name      string      `json:"name"`
+	EnName    string      `json:"en_name"`
+	TenantKey string      `json:"tenant_key"`
 }
 
 type Repo struct {
-	ID          int        `json:"id"`
-	Name        string     `json:"name"`
-	Platform    string     `json:"platform"`
-	ExternalID  int        `json:"external_id"`
-	ExternalURL string     `json:"external_url"`
-	GitURL      string     `json:"git_url"`
-	GitSSHURL   string     `json:"git_ssh_url"`
-	GitHTTPURL  string     `json:"git_http_url"`
-	Type        string     `json:"type"`
-	Level       string     `json:"level"`
-	Status      string     `json:"status"`
-	Description string     `json:"description"`
-	IsMonorepo  bool       `json:"is_monorepo"`
-	MergeMethod string     `json:"merge_method"`
-	Squash      string     `json:"squash"`
-	Department  Department `json:"department"`
-	CreatedAt   string     `json:"created_at"`
-	AuditStatus string     `json:"audit_status"`
+	ID          flexibleInt `json:"id"`
+	Name        string      `json:"name"`
+	Platform    string      `json:"platform"`
+	ExternalID  flexibleInt `json:"external_id"`
+	ExternalURL string      `json:"external_url"`
+	GitURL      string      `json:"git_url"`
+	GitSSHURL   string      `json:"git_ssh_url"`
+	GitHTTPURL  string      `json:"git_http_url"`
+	Type        string      `json:"type"`
+	Level       string      `json:"level"`
+	Status      string      `json:"status"`
+	Description string      `json:"description"`
+	IsMonorepo  bool        `json:"is_monorepo"`
+	MergeMethod string      `json:"merge_method"`
+	Squash      string      `json:"squash"`
+	Department  Department  `json:"department"`
+	CreatedAt   string      `json:"created_at"`
+	AuditStatus string      `json:"audit_status"`
 }
 
 type DisplayName struct {
 	Content string `json:"content"`
-	I18n    string `json:"i18n"`
+	I18n    any    `json:"i18n"`
 }
 
 type User struct {
-	ID          int         `json:"id"`
+	ID          flexibleInt `json:"id"`
 	Username    string      `json:"username"`
 	DisplayName DisplayName `json:"display_name"`
 	Email       string      `json:"email"`
 }
 
 type MR struct {
-	ID              int    `json:"id"`
-	Number          int    `json:"number"`
-	Status          string `json:"status"`
-	SourceBranch    string `json:"source_branch_name"`
-	TargetBranch    string `json:"target_branch_name"`
-	Title           string `json:"title"`
-	Description     string `json:"description"`
-	CreatedBy       User   `json:"created_by"`
-	CreatedAt       string `json:"created_at"`
-	UpdatedAt       string `json:"updated_at"`
-	ChangesCount    int    `json:"changes_count"`
-	CommitsCount    int    `json:"commits_count"`
-	MergeMethod     string `json:"merge_method"`
-	Draft           bool   `json:"draft"`
-	SquashCommits   bool   `json:"squash_commits"`
-	AutoMerge       bool   `json:"auto_merge"`
-	MergeInProgress bool   `json:"merge_in_progress"`
+	ID              flexibleInt `json:"id"`
+	Number          flexibleInt `json:"number"`
+	Status          string      `json:"status"`
+	SourceBranch    string      `json:"source_branch_name"`
+	TargetBranch    string      `json:"target_branch_name"`
+	Title           string      `json:"title"`
+	Description     string      `json:"description"`
+	CreatedBy       User        `json:"created_by"`
+	CreatedAt       string      `json:"created_at"`
+	UpdatedAt       string      `json:"updated_at"`
+	ChangesCount    flexibleInt `json:"changes_count"`
+	CommitsCount    flexibleInt `json:"commits_count"`
+	MergeMethod     string      `json:"merge_method"`
+	Draft           bool        `json:"draft"`
+	SquashCommits   bool        `json:"squash_commits"`
+	AutoMerge       bool        `json:"auto_merge"`
+	MergeInProgress bool        `json:"merge_in_progress"`
 }
 
 type Position struct {
-	Type      string `json:"type"`
-	Side      string `json:"side"`
-	Path      string `json:"path"`
-	StartLine int    `json:"start_line"`
-	EndLine   int    `json:"end_line"`
+	Type      string      `json:"type"`
+	Side      string      `json:"side"`
+	Path      string      `json:"path"`
+	StartLine flexibleInt `json:"start_line"`
+	EndLine   flexibleInt `json:"end_line"`
 }
 
 type Suggestion struct {
@@ -90,7 +90,7 @@ type Suggestion struct {
 }
 
 type Comment struct {
-	ID          int          `json:"id"`
+	ID          flexibleInt  `json:"id"`
 	Content     string       `json:"content"`
 	CreatedAt   string       `json:"created_at"`
 	UpdatedAt   string       `json:"updated_at"`
@@ -99,11 +99,11 @@ type Comment struct {
 }
 
 type Thread struct {
-	ID        int        `json:"id"`
-	Status    string     `json:"status"`
-	Outdated  bool       `json:"outdated"`
-	Comments  []Comment  `json:"comments"`
-	Positions []Position `json:"positions"`
+	ID        flexibleInt `json:"id"`
+	Status    string      `json:"status"`
+	Outdated  bool        `json:"outdated"`
+	Comments  []Comment   `json:"comments"`
+	Positions []Position  `json:"positions"`
 }
 
 func Codebase(args []string, out Output) (int, error) {
@@ -155,7 +155,7 @@ Options:
 	}
 	fs := flag.NewFlagSet("codebase repo info", flag.ContinueOnError)
 	fs.SetOutput(out.Err)
-	if err := fs.Parse(args[1:]); err != nil {
+	if err := fs.Parse(normalizeFlags(args[1:], nil, nil)); err != nil {
 		return 1, err
 	}
 	if fs.NArg() == 0 {
@@ -219,7 +219,7 @@ Options:
 	fs.SetOutput(out.Err)
 	repo := fs.String("repo", "", "仓库名 group/project")
 	fs.StringVar(repo, "R", "", "仓库名 group/project")
-	if err := fs.Parse(args); err != nil {
+	if err := fs.Parse(normalizeFlags(args, stringSet("R", "repo"), nil)); err != nil {
 		return 1, err
 	}
 	if fs.NArg() == 0 {
@@ -233,7 +233,7 @@ Options:
 	if err != nil {
 		return authExitCode(err), err
 	}
-	mr, err := getMR(info.ID, atoiDefault(fs.Arg(0), 0))
+	mr, err := getMR(info.ID.Int(), atoiDefault(fs.Arg(0), 0))
 	if err != nil {
 		return authExitCode(err), err
 	}
@@ -274,7 +274,7 @@ Options:
 	repo := fs.String("repo", "", "仓库名 group/project")
 	fs.StringVar(repo, "R", "", "仓库名 group/project")
 	unresolved := fs.Bool("unresolved", false, "只显示未解决的评论")
-	if err := fs.Parse(args); err != nil {
+	if err := fs.Parse(normalizeFlags(args, stringSet("R", "repo"), stringSet("unresolved"))); err != nil {
 		return 1, err
 	}
 	if fs.NArg() == 0 {
@@ -288,11 +288,11 @@ Options:
 	if err != nil {
 		return authExitCode(err), err
 	}
-	mr, err := getMR(info.ID, atoiDefault(fs.Arg(0), 0))
+	mr, err := getMR(info.ID.Int(), atoiDefault(fs.Arg(0), 0))
 	if err != nil {
 		return authExitCode(err), err
 	}
-	threads, err := getMRThreads(info.ID, mr.ID)
+	threads, err := getMRThreads(info.ID.Int(), mr.ID.Int())
 	if err != nil {
 		return authExitCode(err), err
 	}
@@ -342,7 +342,7 @@ func getMR(repoID, number int) (MR, error) {
 		return MR{}, err
 	}
 	body := map[string]any{
-		"RepoId": repoID,
+		"RepoId": fmt.Sprint(repoID),
 		"Number": number,
 		"Selector": map[string]bool{
 			"Labels": true, "CurrentUser": true, "Version": true, "User": true,
@@ -352,8 +352,19 @@ func getMR(repoID, number int) (MR, error) {
 	if err != nil {
 		return MR{}, err
 	}
-	var mr MR
-	return mr, readJSON(resp, &mr)
+	var payload struct {
+		Result struct {
+			MergeRequest MR `json:"merge_request"`
+		} `json:"result"`
+		MergeRequest MR `json:"merge_request"`
+	}
+	if err := readJSON(resp, &payload); err != nil {
+		return MR{}, err
+	}
+	if payload.Result.MergeRequest.ID.Int() != 0 || payload.Result.MergeRequest.Number.Int() != 0 {
+		return payload.Result.MergeRequest, nil
+	}
+	return payload.MergeRequest, nil
 }
 
 func getMRThreads(repoID, mrID int) ([]Thread, error) {
@@ -361,16 +372,22 @@ func getMRThreads(repoID, mrID int) ([]Thread, error) {
 	if err != nil {
 		return nil, err
 	}
-	body := map[string]any{"RepoId": repoID, "CommentableId": mrID, "CommentableType": "merge_request"}
+	body := map[string]any{"RepoId": fmt.Sprint(repoID), "CommentableId": fmt.Sprint(mrID), "CommentableType": "merge_request"}
 	resp, err := httpclient.Post(mrAPIBase+"?Action=ListThreads", body, map[string]string{"x-codebase-user-jwt": token})
 	if err != nil {
 		return nil, err
 	}
 	var payload struct {
+		Result struct {
+			Threads []Thread `json:"threads"`
+		} `json:"result"`
 		Threads []Thread `json:"threads"`
 	}
 	if err := readJSON(resp, &payload); err != nil {
 		return nil, err
+	}
+	if payload.Result.Threads != nil {
+		return payload.Result.Threads, nil
 	}
 	return payload.Threads, nil
 }

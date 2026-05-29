@@ -79,7 +79,7 @@ Options:
 	}
 	fs := flag.NewFlagSet("psm idl", flag.ContinueOnError)
 	fs.SetOutput(out.Err)
-	if err := fs.Parse(args); err != nil {
+	if err := fs.Parse(normalizeFlags(args, nil, nil)); err != nil {
 		return 1, err
 	}
 	if fs.NArg() == 0 {
@@ -116,7 +116,7 @@ Options:
 	}
 	fs := flag.NewFlagSet("psm api-list", flag.ContinueOnError)
 	fs.SetOutput(out.Err)
-	if err := fs.Parse(args); err != nil {
+	if err := fs.Parse(normalizeFlags(args, nil, nil)); err != nil {
 		return 1, err
 	}
 	if fs.NArg() == 0 {
@@ -167,7 +167,7 @@ Options:
 	fs.SetOutput(out.Err)
 	region := fs.String("region", "us", "区域")
 	fs.StringVar(region, "r", "us", "区域")
-	if err := fs.Parse(args); err != nil {
+	if err := fs.Parse(normalizeFlags(args, stringSet("r", "region"), nil)); err != nil {
 		return 1, err
 	}
 	if fs.NArg() == 0 {

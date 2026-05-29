@@ -2,7 +2,6 @@ package httpclient
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -33,9 +32,7 @@ func Request(method, url string, body any, headers map[string]string) (*http.Res
 		}
 		reader = bytes.NewReader(data)
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
-	defer cancel()
-	req, err := http.NewRequestWithContext(ctx, method, url, reader)
+	req, err := http.NewRequest(method, url, reader)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +43,8 @@ func Request(method, url string, body any, headers map[string]string) (*http.Res
 	for key, value := range headers {
 		req.Header.Set(key, value)
 	}
-	return http.DefaultClient.Do(req)
+	client := http.Client{Timeout: defaultTimeout}
+	return client.Do(req)
 }
 
 func Get(url string, headers map[string]string) (*http.Response, error) {
