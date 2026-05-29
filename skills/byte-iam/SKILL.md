@@ -27,6 +27,8 @@ byte-cli iam list -p 2 -s 20
 
 ## 查询服务账号密钥
 
+此命令会打印服务账号密钥，只在用户明确需要查看密钥时运行，避免在普通排查中调用。
+
 ```bash
 byte-cli iam secret <account-name>
 byte-cli iam secret <account-name> -r us

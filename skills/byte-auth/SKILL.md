@@ -23,6 +23,20 @@ byte-cli auth config set-cookie <value> --region us
 byte-cli auth config set-cookie <value> --region codebase
 ```
 
+## 登录刷新认证
+
+```bash
+byte-cli auth login --region cn
+byte-cli auth login --region us
+byte-cli auth login --region codebase
+```
+
+等价短参数：
+
+```bash
+byte-cli auth login -r us
+```
+
 ## 获取 Token
 
 ```bash

@@ -21,6 +21,7 @@ byte-cli codebase mr get <number>
 
 # 指定仓库
 byte-cli codebase mr get <number> --repo <group/project>
+byte-cli codebase mr get <number> -R <group/project>
 ```
 
 ## 查看 MR 评论
@@ -28,22 +29,26 @@ byte-cli codebase mr get <number> --repo <group/project>
 ```bash
 # 查看所有评论
 byte-cli codebase mr comments <number>
+byte-cli codebase mr comments <number> -R <group/project>
 
 # 只看未解决评论
 byte-cli codebase mr comments <number> --unresolved
+byte-cli codebase mr comments <number> -R <group/project> --unresolved
 ```
 
 ## JSON 输出
 
 ```bash
 byte-cli --json codebase repo info <group/project>
-byte-cli --json codebase mr get <number>
-byte-cli --json codebase mr comments <number>
+byte-cli --json codebase mr get <number> -R <group/project>
+byte-cli --json codebase mr comments <number> -R <group/project>
+byte-cli codebase mr comments <number> -R <group/project> --json
 ```
 
 ## 自动推断仓库
 
 在 git 仓库中运行时，可从 remote URL 自动推断仓库名，无需手动指定。
+不在目标 git 仓库中，或 remote 无法推断 Codebase 仓库名时，需要使用 `-R/--repo <group/project>`。
 
 ## 评论解析
 

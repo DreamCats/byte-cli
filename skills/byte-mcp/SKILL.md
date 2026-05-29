@@ -18,6 +18,8 @@ byte-cli mcp list -s live_content
 
 # 指定环境
 byte-cli mcp list -e prod
+byte-cli mcp list -e ppe
+byte-cli mcp list -r us -e ppe
 
 # 指定区域
 byte-cli mcp list -r us
@@ -56,6 +58,12 @@ byte-cli mcp call <server_id> <tool_name> -a "key=value"
 # 多个参数
 byte-cli mcp call <server_id> <tool_name> -a "key1=value1" -a "key2=value2"
 
+# JSON 值参数（array/bool/number/object 会按 JSON 解析）
+byte-cli mcp call <server_id> <tool_name> \
+    -a 'targets=[{"target_type":1,"product_id":123456789}]' \
+    -a "dry_run=true" \
+    -a "region=US"
+
 # 指定区域
 byte-cli mcp call <server_id> <tool_name> -r us
 ```
@@ -71,12 +79,15 @@ byte-cli mcp call j2nkvhut live_content_ai_get_user_sign_info \
     -a "use_cache=true"
 ```
 
+`mcp tools` 和 `mcp call` 只接收 `server_id` 和 `region`，不接收 `env`。如果需要测试 PPE，先用 `mcp list -e ppe` 找到对应 `server_id`，再用该 `server_id` 查询 tools 或调用工具。
+
 ## JSON 输出
 
 ```bash
 byte-cli --json mcp list
 byte-cli --json mcp tools <server_id>
 byte-cli --json mcp call <server_id> <tool_name> -a "key=value"
+byte-cli mcp call <server_id> <tool_name> -a "key=value" --json
 ```
 
 ## 支持区域
