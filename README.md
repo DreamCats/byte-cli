@@ -83,6 +83,12 @@ byte-cli iam secret <name> -r cn
 byte-cli mcp list -s <psm> -r cn
 byte-cli mcp tools <server-id>
 byte-cli mcp call <server-id> <tool-name> -a key=value
+
+byte-cli metrics tagk <metric-name> -r us
+byte-cli metrics tagk <metric-name> --tagkv result=hit -r us
+byte-cli metrics field <metric-name> -r us
+byte-cli metrics query <metric-name> -r us
+byte-cli metrics query <metric-name> --group-by topic -r us
 ```
 
 Global `--json` is supported, including after subcommands:
@@ -102,6 +108,7 @@ skills/
 ├── byte-iam/
 ├── byte-log/
 ├── byte-mcp/
+├── byte-metrics/
 ├── byte-psm/
 └── byte-repo/
 ```

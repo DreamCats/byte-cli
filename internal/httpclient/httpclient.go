@@ -20,9 +20,19 @@ const (
 )
 
 func Request(method, url string, body any, headers map[string]string) (*http.Response, error) {
+	return request(method, url, body, headers, true)
+}
+
+func RequestNoProxy(method, url string, body any, headers map[string]string) (*http.Response, error) {
+	return request(method, url, body, headers, false)
+}
+
+func request(method, url string, body any, headers map[string]string, useConfiguredProxy bool) (*http.Response, error) {
 	if proxy := configuredProxy(); proxy != "" {
-		_ = os.Setenv("HTTPS_PROXY", proxy)
-		_ = os.Setenv("HTTP_PROXY", proxy)
+		if useConfiguredProxy {
+			_ = os.Setenv("HTTPS_PROXY", proxy)
+			_ = os.Setenv("HTTP_PROXY", proxy)
+		}
 	}
 	var reader io.Reader
 	if body != nil {
@@ -44,6 +54,9 @@ func Request(method, url string, body any, headers map[string]string) (*http.Res
 		req.Header.Set(key, value)
 	}
 	client := http.Client{Timeout: defaultTimeout}
+	if !useConfiguredProxy {
+		client.Transport = &http.Transport{Proxy: nil}
+	}
 	return client.Do(req)
 }
 

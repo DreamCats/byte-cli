@@ -108,6 +108,8 @@ func runCommand(cmd string, args []string, out commands.Output) (int, error) {
 		return commands.IAM(args, out)
 	case "mcp":
 		return commands.MCP(args, out)
+	case "metrics":
+		return commands.Metrics(args, out)
 	case "version":
 		fmt.Fprintf(out.Out, "byte-cli %s\n", version)
 		return 0, nil
@@ -134,5 +136,6 @@ Commands:
   psm        PSM 服务信息查询
   iam        IAM 服务账号查询
   mcp        MCP Server 查询
+  metrics    Metrics 指标查询
   version    显示版本信息`)
 }
