@@ -35,6 +35,13 @@ func ParseRegion(value string) (Region, error) {
 	return Region{Value: v, AuthURL: url, CookieName: cookieName, IsCodebase: v == "codebase"}, nil
 }
 
+func (r Region) LoginURL() string {
+	if r.IsCodebase {
+		return ""
+	}
+	return strings.TrimSuffix(r.AuthURL, "/jwt") + "/login"
+}
+
 func AllRegions() []Region {
 	out := make([]Region, 0, len(allRegionValues))
 	for _, value := range allRegionValues {

@@ -29,7 +29,7 @@ func Auth(args []string, out Output) (int, error) {
 
 func authLogin(args []string, out Output) (int, error) {
 	if wantsHelp(args) {
-		printHelp(out, `获取并缓存 JWT Token
+		printHelp(out, `获取并缓存 JWT Token。云区域未配置可用 Cookie 时会启动浏览器登录
 
 Usage:
   byte-cli auth login [options]
@@ -50,7 +50,7 @@ Options:
 	if err != nil {
 		return 1, err
 	}
-	token, err := auth.NewManager(region).GetToken(true)
+	token, err := auth.NewManager(region).LoginInteractive(out.Err)
 	if err != nil {
 		return authExitCode(err), err
 	}
