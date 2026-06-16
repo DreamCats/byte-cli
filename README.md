@@ -58,9 +58,10 @@ cn, i18n, us, eu, codebase
 Cookies and tokens are sensitive. Avoid pasting real credentials into docs,
 tests, issues, or commits.
 
-For `cn`, `i18n`, `us`, and `eu`, `byte-cli auth login` can start a browser SSO
-window when no usable Cookie is configured. `codebase` still requires
-`CAS_SESSION_API`. If the browser cannot be found automatically, set
+For `cn`, `i18n`, `us`, `eu`, and `codebase`, `byte-cli auth login` can start a
+browser SSO window when no usable Cookie is configured. Cloud regions cache
+`CAS_SESSION`; `codebase` caches `CAS_SESSION_API` from `bits.bytedance.net`. If
+the browser cannot be found automatically, set
 `BYTE_CLI_BROWSER` to a Chrome/Chromium/Edge executable.
 
 ## Common Commands

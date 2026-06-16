@@ -30,7 +30,7 @@ func TestRegionLoginURL(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got := codebase.LoginURL(); got != "" {
-		t.Fatalf("codebase LoginURL() = %q, want empty", got)
+	if got, want := codebase.LoginURL(), "https://bits.bytedance.net/api/v1/identity/login?next=https%3A%2F%2Fbits.bytedance.net%2Fworkbench"; got != want {
+		t.Fatalf("codebase LoginURL() = %q, want %q", got, want)
 	}
 }

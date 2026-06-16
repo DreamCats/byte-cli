@@ -37,8 +37,8 @@ byte-cli auth login --region codebase
 byte-cli auth login -r us
 ```
 
-对于 cn/us/i18n/eu 云区域，如果没有配置可用 Cookie，命令会启动浏览器 SSO 登录并自动缓存 Cookie 和 Token。
-codebase 仍需要配置 CAS_SESSION_API Cookie。
+如果没有配置可用 Cookie，命令会启动浏览器 SSO 登录并自动缓存 Cookie 和 Token。
+cn/us/i18n/eu 缓存 CAS_SESSION，codebase 缓存 bits.bytedance.net 的 CAS_SESSION_API。
 
 ## 获取 Token
 

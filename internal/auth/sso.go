@@ -61,9 +61,6 @@ type cdpCookieResponse struct {
 }
 
 func (m Manager) LoginInteractive(out io.Writer) (string, error) {
-	if m.Region.IsCodebase {
-		return m.GetToken(true)
-	}
 	if token, err := m.fetchToken(); err == nil {
 		if err := setCached(m.Region.Value, token); err != nil {
 			return "", err

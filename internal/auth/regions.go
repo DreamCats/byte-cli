@@ -20,6 +20,8 @@ var authURLs = map[string]string{
 	"codebase": "https://bits.bytedance.net/api/v1/codebase_token",
 }
 
+const codebaseLoginURL = "https://bits.bytedance.net/api/v1/identity/login?next=https%3A%2F%2Fbits.bytedance.net%2Fworkbench"
+
 var allRegionValues = []string{"cn", "i18n", "us", "eu", "codebase"}
 
 func ParseRegion(value string) (Region, error) {
@@ -37,7 +39,7 @@ func ParseRegion(value string) (Region, error) {
 
 func (r Region) LoginURL() string {
 	if r.IsCodebase {
-		return ""
+		return codebaseLoginURL
 	}
 	return strings.TrimSuffix(r.AuthURL, "/jwt") + "/login"
 }
