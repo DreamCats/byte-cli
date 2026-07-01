@@ -23,10 +23,6 @@ func Request(method, url string, body any, headers map[string]string) (*http.Res
 	return request(method, url, body, headers, true)
 }
 
-func RequestNoProxy(method, url string, body any, headers map[string]string) (*http.Response, error) {
-	return request(method, url, body, headers, false)
-}
-
 func request(method, url string, body any, headers map[string]string, useConfiguredProxy bool) (*http.Response, error) {
 	if proxy := configuredProxy(); proxy != "" {
 		if useConfiguredProxy {

@@ -516,7 +516,7 @@ func requestMetricsSuggest(cfg metricsRegionConfig, path string, params url.Valu
 	if err != nil {
 		return MetricsSuggestResponse{}, err
 	}
-	resp, err := httpclient.RequestNoProxy(http.MethodGet, metricsSuggestURL(cfg.APIBase, path, params), nil, metricsHeaders(token, cfg, false))
+	resp, err := httpclient.Request(http.MethodGet, metricsSuggestURL(cfg.APIBase, path, params), nil, metricsHeaders(token, cfg, false))
 	if err != nil {
 		return MetricsSuggestResponse{}, err
 	}
@@ -535,7 +535,7 @@ func requestMetricsRawPost(cfg metricsRegionConfig, apiBase, path string, params
 	if err != nil {
 		return nil, err
 	}
-	resp, err := httpclient.RequestNoProxy(http.MethodPost, metricsSuggestURL(apiBase, path, params), body, metricsHeaders(token, cfg, true))
+	resp, err := httpclient.Request(http.MethodPost, metricsSuggestURL(apiBase, path, params), body, metricsHeaders(token, cfg, true))
 	if err != nil {
 		return nil, err
 	}
