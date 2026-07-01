@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/DreamCats/byte-cli/internal/config"
 	"github.com/DreamCats/byte-cli/internal/httpclient"
@@ -66,15 +67,15 @@ func (m Manager) fetchNormalToken(cookie string) (string, error) {
 	headers["Cookie"] = fmt.Sprintf("%s=%s", m.Region.CookieName, cookie)
 	resp, err := httpclient.Get(m.Region.AuthURL, headers)
 	if err != nil {
-		return "", TokenFetch(err.Error())
+		return "", TokenFetchForRegion(m.Region, err.Error())
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return "", TokenFetch(fmt.Sprintf("HTTP %d", resp.StatusCode))
+		return "", TokenFetchForRegion(m.Region, responseErrorDetail(resp))
 	}
 	token := resp.Header.Get("x-jwt-token")
 	if token == "" {
-		return "", InvalidResponse("响应头中未找到 x-jwt-token")
+		return "", InvalidResponse(fmt.Sprintf("区域 %s 响应头中未找到 x-jwt-token，请确认 Cookie 属于该区域且未过期", m.Region.Value))
 	}
 	return token, nil
 }
@@ -84,11 +85,11 @@ func (m Manager) fetchCodebaseToken(cookie string) (string, error) {
 	headers["Cookie"] = fmt.Sprintf("%s=%s", m.Region.CookieName, cookie)
 	resp, err := httpclient.Get(m.Region.AuthURL, headers)
 	if err != nil {
-		return "", TokenFetch(err.Error())
+		return "", TokenFetchForRegion(m.Region, err.Error())
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return "", TokenFetch(fmt.Sprintf("HTTP %d", resp.StatusCode))
+		return "", TokenFetchForRegion(m.Region, responseErrorDetail(resp))
 	}
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -106,13 +107,39 @@ func (m Manager) fetchCodebaseToken(cookie string) (string, error) {
 		if payload.Message == "" {
 			payload.Message = "未知错误"
 		}
-		return "", TokenFetch(payload.Message)
+		return "", TokenFetchForRegion(m.Region, payload.Message)
 	}
 	token := payload.Data["codebase_user_jwt"]
 	if token == "" {
-		return "", InvalidResponse("JSON 响应中未找到 data.codebase_user_jwt")
+		return "", InvalidResponse(fmt.Sprintf("区域 %s JSON 响应中未找到 data.codebase_user_jwt，请确认 Cookie 属于该区域且未过期", m.Region.Value))
 	}
 	return token, nil
+}
+
+func responseErrorDetail(resp *http.Response) string {
+	parts := []string{fmt.Sprintf("HTTP %d", resp.StatusCode)}
+	if logID := resp.Header.Get("x-tt-logid"); logID != "" {
+		parts = append(parts, "logid="+logID)
+	}
+	if body := readResponsePreview(resp.Body, 300); body != "" {
+		parts = append(parts, body)
+	}
+	return strings.Join(parts, "; ")
+}
+
+func readResponsePreview(body io.Reader, limit int64) string {
+	if body == nil || limit <= 0 {
+		return ""
+	}
+	data, err := io.ReadAll(io.LimitReader(body, limit+1))
+	if err != nil {
+		return ""
+	}
+	text := strings.TrimSpace(string(data))
+	if int64(len(data)) > limit {
+		text = text[:limit] + "..."
+	}
+	return text
 }
 
 func cloneHeaders(headers map[string]string) map[string]string {

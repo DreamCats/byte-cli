@@ -71,6 +71,7 @@ byte-cli auth login -r cn
 byte-cli auth status
 byte-cli auth token -r cn
 byte-cli auth config show
+byte-cli auth config show --show-secret
 byte-cli auth config set-cookie <cookie> -r cn
 
 byte-cli codebase repo info <group/project>

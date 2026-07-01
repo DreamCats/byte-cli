@@ -54,7 +54,10 @@ Token 会自动缓存，1 小时有效期。
 
 ```bash
 byte-cli auth config show
+byte-cli auth config show --show-secret
 ```
+
+默认脱敏显示 Cookie；只有需要复制到开发机或排查跨机器认证问题时，才使用 `--show-secret` 输出完整 Cookie。
 
 ## 区域说明
 

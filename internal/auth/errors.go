@@ -1,6 +1,9 @@
 package auth
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type Error struct {
 	Message string
@@ -19,6 +22,13 @@ func CookieNotFound(region string) Error {
 
 func TokenFetch(message string) Error {
 	return Error{Message: "获取 Token 失败: " + message}
+}
+
+func TokenFetchForRegion(region Region, message string) Error {
+	parts := []string{fmt.Sprintf("区域 %s 获取 Token 失败: %s", region.Value, message)}
+	parts = append(parts, fmt.Sprintf("建议: 确认当前 Cookie 属于 %s 区域且未过期。", region.Value))
+	parts = append(parts, fmt.Sprintf("可运行 `byte-cli auth login -r %s` 重新登录，或用 `byte-cli auth config show --show-secret` 检查复制到开发机的 Cookie。", region.Value))
+	return Error{Message: strings.Join(parts, "\n")}
 }
 
 func InvalidResponse(message string) Error {

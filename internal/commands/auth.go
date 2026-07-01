@@ -129,7 +129,7 @@ Commands:
 	}
 	switch args[0] {
 	case "show":
-		return authConfigShow(out)
+		return authConfigShow(args[1:], out)
 	case "set-cookie":
 		return authConfigSetCookie(args[1:], out)
 	default:
@@ -137,7 +137,27 @@ Commands:
 	}
 }
 
-func authConfigShow(out Output) (int, error) {
+func authConfigShow(args []string, out Output) (int, error) {
+	if wantsHelp(args) {
+		printHelp(out, `查看当前配置
+
+Usage:
+  byte-cli auth config show [options]
+
+Options:
+  --show-secret  输出完整 Cookie（默认脱敏）
+  -h, --help     显示帮助信息`)
+		return 0, nil
+	}
+	fs := flag.NewFlagSet("auth config show", flag.ContinueOnError)
+	fs.SetOutput(out.Err)
+	showSecret := fs.Bool("show-secret", false, "输出完整 Cookie（默认脱敏）")
+	if err := fs.Parse(normalizeFlags(args, nil, stringSet("show-secret"))); err != nil {
+		return 1, err
+	}
+	if fs.NArg() > 0 {
+		return 1, fmt.Errorf("show does not accept arguments: %s", fs.Arg(0))
+	}
 	cfg, err := config.Load()
 	if err != nil {
 		return 1, err
@@ -149,7 +169,11 @@ func authConfigShow(out Output) (int, error) {
 			fmt.Fprintf(out.Out, "  %s: (未配置)\n", region.Value)
 			continue
 		}
-		fmt.Fprintf(out.Out, "  %s: %s\n", region.Value, config.MaskCookie(cookie))
+		value := cookie
+		if !*showSecret {
+			value = config.MaskCookie(cookie)
+		}
+		fmt.Fprintf(out.Out, "  %s: %s\n", region.Value, value)
 	}
 	if cfg.Proxy.HTTPS != "" || cfg.Proxy.HTTP != "" {
 		fmt.Fprintln(out.Out, "\n代理:")
